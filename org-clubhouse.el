@@ -557,8 +557,8 @@ or create cards for all the headlines in the selected region.
 All stories are added to the same project and epic, as selected via two prompts.
 If the stories already have a CLUBHOUSE-ID, they are filtered and ignored."
   (interactive
-    (when (use-region-p)
-      (list (region-beginning) (region-end))))
+   (when (use-region-p)
+     (list (region-beginning) (region-end))))
 
   (let* ((elts     (org-clubhouse-collect-headlines beg end))
          (new-elts (-remove (lambda (elt) (plist-get elt :CLUBHOUSE-ID)) elts)))
@@ -566,20 +566,20 @@ If the stories already have a CLUBHOUSE-ID, they are filtered and ignored."
      (lambda (project-id)
        (when project-id
          (org-clubhouse-prompt-for-epic
-           (lambda (epic-id)
-             (let ((selected-story-type org-clubhouse-default-story-type))
-               (if (not selected-story-type)
-                 (org-clubhouse-prompt-for-story-type
-                    (lambda (story-type)
-                      set selected-story-type story-type))
-                (-map (lambda (elt)
-                    (let* ((title (plist-get elt :title))
-                            (story (org-clubhouse-create-story-internal
-                                    title
-                                    :project-id project-id
-                                    :epic-id epic-id
-                                    :story-type selected-story-type)))
-                    (org-clubhouse-populate-created-story elt story))) new-elts))))))))))
+          (lambda (epic-id)
+            (let ((selected-story-type org-clubhouse-default-story-type))
+              (when (not selected-story-type)
+                (org-clubhouse-prompt-for-story-type
+                 (lambda (story-type)
+                   (set 'selected-story-type story-type))))
+              (-map (lambda (elt)
+                      (let* ((title (plist-get elt :title))
+                             (story (org-clubhouse-create-story-internal
+                                     title
+                                     :project-id project-id
+                                     :epic-id epic-id
+                                     :story-type selected-story-type)))
+                        (org-clubhouse-populate-created-story elt story))) new-elts)))))))))
 
 ;;;
 ;;; Story updates
